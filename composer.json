@@ -1,0 +1,11 @@
+{
+    "name": "particles/desma-php",
+    "description": "Wrapper for Desma SMS API",
+    "authors": [
+        {
+            "name": "Henry Ohanga",
+            "email": "ohanga.henry@gmail.com"
+        }
+    ],
+    "require": {}
+}
