@@ -1,7 +1,7 @@
 <?php
 namespace particles\Desma;
 
-require_once 'vendor/autoload.php';
+require_once './vendor/autoload.php';
 
 const SMS_URL = "https://2l4np.api.infobip.com/sms/2/text/advanced";
 
@@ -17,12 +17,16 @@ class Gateway {
 
 
     public function send($sms, $phone) {
-        $headers = ["Accept" => "application/json", "Authorization" => $this->getAuthorization()];
+        $headers = [
+            "Accept" => "application/json", 
+            "Authorization" => $this->getAuthorization(),
+            "Content-Type" => "application/json"
+        ];
         $body = \Unirest\Request\Body::json($this->getPayload($sms, $phone));
 
         $resp = \Unirest\Request::post(SMS_URL, $headers, $body);
         
-        echo $resp;
+        return $resp;
     }
 
     private function getAuthorization() {
@@ -32,10 +36,12 @@ class Gateway {
     private function getPayload($sms, $phone) {
         return [
             "messages" => [
-                "destinations" => [
-                    ["to" => $phone],
-                ],
-                "text" => $sms
+                [
+                    "destinations" => [
+                        ["to" => $phone],
+                    ],
+                    "text" => $sms
+                ]
             ]
         ];
     }
