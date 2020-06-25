@@ -1,6 +1,6 @@
 {
   "name": "particles/desma-php",
-  "description": "Wrapper for Desma SMS API",
+  "description": "Wrapper for Desma business APIs: sms, payments and more",
   "type": "library",
   "license": "MIT",
   "authors": [
@@ -11,7 +11,7 @@
   ],
   "autoload": {
     "psr-4": {
-      "particles\\Desma\\": "src/"
+      "Particles\\Desma\\": "src/"
     }
   },
   "require": {
