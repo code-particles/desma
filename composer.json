@@ -6,7 +6,9 @@
   "authors": [
     {
       "name": "Henry Ohanga",
-      "email": "ohanga.henry@gmail.com"
+      "email": "ohanga.henry@particles.co.ke",
+      "role": "Maintainer",
+      "homepage": "https://henryohanga.com"
     }
   ],
   "autoload": {
@@ -16,5 +18,8 @@
   },
   "require": {
     "mashape/unirest-php": "^3.0"
+  },
+  "support": {
+    "email": "ohanga.henry@particles.co.ke"
   }
 }
