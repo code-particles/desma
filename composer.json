@@ -13,7 +13,7 @@
   ],
   "autoload": {
     "psr-4": {
-      "\\particles\\desma\\": "src/"
+      "Desma\\": "src/Desma/"
     }
   },
   "require": {

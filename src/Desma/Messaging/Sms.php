@@ -4,8 +4,7 @@
  * @copyright Copyright (c) 2020 Particles
  * @license https://desma.particles.co.ke/license/
  */
-
-namespace particles\desma;
+namespace Desma\Messaging;
 
 const SMS_URL = "https://2l4np.api.infobip.com/sms/2/text/advanced";
 
