@@ -5,7 +5,7 @@
  * @license https://desma.particles.co.ke/license/
  */
 
-namespace Desma;
+namespace Particles\Desma;
 
 const SMS_URL = "https://2l4np.api.infobip.com/sms/2/text/advanced";
 
