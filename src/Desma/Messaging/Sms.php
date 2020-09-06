@@ -40,15 +40,19 @@ class Sms {
      * ```
      * $sms->send("Test message", "254701033089");
      * $sms->send("Test message", ["254701033089", "254700559109"]);
+     * $sms->send("Test flash message", "254701033089", ["flash" => true])
+     * $sms->send("Test flash message", "254701033089", ["flash" => true, "notifyUrl" => ""])
      * ```
      * 
      * @param string $text the text to be sent out
      * @param string|array $to the recipient phone number(s)
+     * @param array $options including optional provision for flash, intermediateReport, 
+     * notifyUrl, notifyContentType, callbackData, validityPeriod
      * @return object the status of the outbound message
      */
-    public function send($text, $to) {
+    public function send($text, $to, $options = []) {
         
-        $body = \Unirest\Request\Body::json($this->getSmsPayload($text, $to));
+        $body = \Unirest\Request\Body::json($this->getSmsPayload($text, $to, $options));
 
         $resp = \Unirest\Request::post(API_BASE_URL . '/sms/2/text/advanced', $this->_headers, $body);
         
@@ -56,7 +60,7 @@ class Sms {
     }
 
     /**
-     * Gets the account total balance  
+     * Gets the account total balance 
      * 
      * @return object the account balance 
      */
@@ -66,15 +70,17 @@ class Sms {
         return $resp;
     }
 
-    private function getSmsPayload($sms, $to) {
+    private function getSmsPayload($sms, $to, $options = []) {
+       
         return [
             "messages" => [
+                array_merge(
                 [
                     "destinations" => [
                         ["to" => $to],
                     ],
                     "text" => $sms
-                ]
+                ], $options)
             ]
         ];
     }
