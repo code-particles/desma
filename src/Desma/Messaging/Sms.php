@@ -6,7 +6,7 @@
  */
 namespace Desma\Messaging;
 
-const SMS_URL = "https://2l4np.api.infobip.com/sms/2/text/advanced";
+const API_BASE_URL = "https://2l4np.api.infobip.com";
 
 /**
  * Sms is the base class for the SMS gateway
@@ -16,49 +16,62 @@ const SMS_URL = "https://2l4np.api.infobip.com/sms/2/text/advanced";
  */
 class Sms {
     private $_username, $_password;
+    private $_headers;
 
     public function __construct($username, $password)
     {
         $this->_username = $username;
         $this->_password = $password;
+
+        $this->_headers = [
+            "Accept" => "application/json", 
+            "Content-Type" => "application/json",
+            "Authorization" => "Basic " . base64_encode($this->_username . ":" . $this->_password),
+        ];;
     }
 
     /**
-     * Submits outbound SMS to the external sms gateway and returns status
+     * Submits a single outbound SMS to the external sms gateway for sending 
+     * to one or more recipients. 
+     * Phone numbers must be in E64 format but without the plus prefix
+     * 
      * For example
      * 
      * ```
      * $sms->send("Test message", "254701033089");
+     * $sms->send("Test message", ["254701033089", "254700559109"]);
      * ```
      * 
      * @param string $text the text to be sent out
-     * @param string|array $recipients the recipient phone number(s) 
+     * @param string|array $to the recipient phone number(s)
      * @return object the status of the outbound message
      */
-    public function send($text, $recipients) {
+    public function send($text, $to) {
         
-        $headers = [
-            "Accept" => "application/json", 
-            "Authorization" => $this->getAuthorization(),
-            "Content-Type" => "application/json"
-        ];
-        $body = \Unirest\Request\Body::json($this->getPayload($text, $recipients));
+        $body = \Unirest\Request\Body::json($this->getSmsPayload($text, $to));
 
-        $resp = \Unirest\Request::post(SMS_URL, $headers, $body);
+        $resp = \Unirest\Request::post(API_BASE_URL . '/sms/2/text/advanced', $this->_headers, $body);
         
         return $resp;
     }
 
-    private function getAuthorization() {
-        return "Basic " . base64_encode($this->_username . ":" . $this->_password);
+    /**
+     * Gets the account total balance  
+     * 
+     * @return object the account balance 
+     */
+    public function getBalance() {
+        $resp =  \Unirest\Request::get(API_BASE_URL . '/account/1/total-balance', $this->_headers);
+
+        return $resp;
     }
 
-    private function getPayload($sms, $phone) {
+    private function getSmsPayload($sms, $to) {
         return [
             "messages" => [
                 [
                     "destinations" => [
-                        ["to" => $phone],
+                        ["to" => $to],
                     ],
                     "text" => $sms
                 ]
