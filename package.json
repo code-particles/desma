@@ -1,0 +1,9 @@
+{
+  "name": "desma-php",
+  "description": "",
+  "license": "",
+  "devDependencies": {
+    "@prettier/plugin-php": "^0.16.0",
+    "prettier": "^2.2.1"
+  }
+}
