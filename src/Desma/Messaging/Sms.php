@@ -6,11 +6,8 @@
  */
 namespace Desma\Messaging;
 
-use BadMethodCallException;
-use Unirest\Request;
+use Unirest\Request as ApiRequest;
 use Unirest\Request\Body;
-
-const API_BASE_URL = "http://164.52.197.71:6005/api/v2";
 
 /**
  * Sms is the base class for the SMS gateway
@@ -20,18 +17,14 @@ const API_BASE_URL = "http://164.52.197.71:6005/api/v2";
  */
 class Sms
 {
-    private $_apiKey, $_clientId;
-    private $_headers;
+    const API_BASE_URL = "http://localhost:8080/v1/messaging/sms";
 
-    public function __construct($apiKey, $clientId)
+    private $username, $password;
+
+    public function __construct($username, $password)
     {
-        $this->_apiKey = $apiKey;
-        $this->_clientId = $clientId;
-
-        $this->_headers = [
-            "Accept" => "application/json",
-            "Content-Type" => "application/json",
-        ];
+        $this->username = $username;
+        $this->password = $password;
     }
 
     /**
@@ -57,13 +50,16 @@ class Sms
      */
     public function send($text, $to, $options = [])
     {
-        $body = Body::Json($this->getSmsPayload($text, $to, $options));
+        $requestBody = Body::Json([
+            "text" => $text,
+            "to" => $to,
+            "options" => $options,
+        ]);
 
-        // print($body);
+        $requestUrl = self::API_BASE_URL . "/send";
+        $headers = $this->getRequestHeaders();
 
-        $requestUrl = API_BASE_URL . "/SendSMS";
-
-        $result = Request::post($requestUrl, $this->_headers, $body);
+        $result = ApiRequest::post($requestUrl, $headers, $requestBody);
 
         return $result->body;
     }
@@ -75,56 +71,22 @@ class Sms
      */
     public function getBalance()
     {
-        $params = [
-            "ApiKey" => $this->_apiKey,
-            "ClientId" => $this->_clientId,
-        ];
+        $url = self::API_BASE_URL . "/balance";
+        $headers = $this->getRequestHeaders();
 
-        $requestUrl =
-            API_BASE_URL . "/Balance?" . http_build_query($params, "&amp");
+        $response = ApiRequest::get($url, $headers);
 
-        $resp = \Unirest\Request::get($requestUrl, $this->_headers);
-
-        return $resp->body;
+        return $response->body;
     }
 
-    protected function getSmsPayload($sms, $to, $options = [])
+    private function getRequestHeaders()
     {
-        if (is_array($to)) {
-            $to = join(",", $to);
-        }
+        $authString = base64_encode($this->username . ":" . $this->password);
 
-        if (is_null($sms) || is_null($to) || !strlen($to)) {
-            throw new BadMethodCallException(
-                "sms and to properties must be set for you to send the sms"
-            );
-        }
-
-        $payload = [
-            "SenderId" => isset($options["senderId"])
-                ? $options["senderId"]
-                : "Particles",
-            "Is_Unicode" => isset($options["isUnicode"])
-                ? $options["isUnicode"]
-                : false,
-            "Is_Flash" => isset($options["isFlash"])
-                ? $options["isFlash"]
-                : false,
-            "SchedTime" => isset($options["sendAt"])
-                ? $options["sendAt"]
-                : false,
-            "Message" => $sms,
-            "MobileNumbers" => $to,
-            "ApiKey" => $this->_apiKey,
-            "ClientId" => $this->_clientId,
+        return [
+            "Content-Type" => "application/json",
+            "Accept" => "application/json",
+            "Authorization" => "Basic " . $authString,
         ];
-
-        foreach ($payload as $key => $value) {
-            if (!$value) {
-                unset($payload[$key]);
-            }
-        }
-
-        return $payload;
     }
 }
