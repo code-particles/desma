@@ -17,7 +17,7 @@ use Unirest\Request\Body;
  */
 class Sms
 {
-    const API_BASE_URL = "http://localhost:8080/v1/messaging/sms";
+    const API_BASE_URL = "https://desma-api.herokuapp.com/v1/messaging/sms";
 
     private $username, $password;
 
